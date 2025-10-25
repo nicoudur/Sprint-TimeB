@@ -24,6 +24,13 @@ exports.list = (req, res) => {
 
 exports.delete = (req, res) => {
   const id = parseInt(req.params.id);
+  const funcionario = funcionarioService.getFuncionarioById(id);
+
+  // Verifica se o funcionário existe
+  if (!funcionario) {
+    return res.status(404).json({ message: 'Funcionário não encontrado.' });
+  }
+
   funcionarioService.deleteFuncionario(id);
-  res.status(204).send();
+  res.status(200).json({ message: 'Funcionário deletado com sucesso.' });
 };

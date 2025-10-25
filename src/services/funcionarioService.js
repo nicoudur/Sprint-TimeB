@@ -21,9 +21,14 @@ function deleteFuncionario(id) {
   if (idx !== -1) db.funcionarios.splice(idx, 1);
 }
 
+function getFuncionarioById(id) {
+  return db.funcionarios.find(f => f.id === id);
+}
+
 module.exports = {
   findByEmail,
   createFuncionario,
   getFuncionarios,
-  deleteFuncionario
+  deleteFuncionario,
+  getFuncionarioById
 };
