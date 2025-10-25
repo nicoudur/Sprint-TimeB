@@ -1,0 +1,347 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API de Agendamento de Salas",
+    "version": "1.0.0",
+    "description": "API para agendamento e gerenciamento de salas de reunião."
+  },
+  "servers": [
+    { "url": "http://localhost:3000" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [{ "bearerAuth": [] }],
+  "paths": {
+    "/funcionarios/register": {
+      "post": {
+        "summary": "Registra um novo funcionário",
+        "tags": ["Funcionário"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nome": { "type": "string" },
+                  "email": { "type": "string" },
+                  "senha": { "type": "string" }
+                },
+                "required": ["nome", "email", "senha"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Funcionário registrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "integer" },
+                    "nome": { "type": "string" },
+                    "email": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Email já cadastrado ou campos obrigatórios ausentes" }
+        }
+      }
+    },
+    "/funcionarios/login": {
+      "post": {
+        "summary": "Login de funcionário",
+        "tags": ["Funcionário"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" },
+                  "senha": { "type": "string" }
+                },
+                "required": ["email", "senha"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login bem-sucedido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Credenciais inválidas" }
+        }
+      }
+    },
+    "/funcionarios": {
+      "get": {
+        "summary": "Lista todos os funcionários",
+        "tags": ["Funcionário"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista de funcionários",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "integer" },
+                      "nome": { "type": "string" },
+                      "email": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/funcionarios/{id}": {
+      "delete": {
+        "summary": "Remove um funcionário",
+        "tags": ["Funcionário"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Funcionário removido" },
+          "404": { "description": "Funcionário não encontrado" }
+        }
+      }
+    },
+    "/salas": {
+      "post": {
+        "summary": "Cria uma nova sala",
+        "tags": ["Sala"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nome": { "type": "string" }
+                },
+                "required": ["nome"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Sala criada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "integer" },
+                    "nome": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Sala já existe ou nome obrigatório ausente" }
+        }
+      },
+      "get": {
+        "summary": "Lista todas as salas",
+        "tags": ["Sala"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista de salas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "integer" },
+                      "nome": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/salas/{id}": {
+      "delete": {
+        "summary": "Remove uma sala",
+        "tags": ["Sala"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Sala removida" },
+          "404": { "description": "Sala não encontrada" }
+        }
+      }
+    },
+    "/salas/disponiveis": {
+      "get": {
+        "summary": "Lista salas disponíveis para data e horário",
+        "tags": ["Sala"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "in": "query", "name": "data", "required": true, "schema": { "type": "string", "format": "date" } },
+          { "in": "query", "name": "horaInicio", "required": true, "schema": { "type": "string" } },
+          { "in": "query", "name": "horaFim", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de salas disponíveis",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "integer" },
+                      "nome": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Parâmetros obrigatórios ausentes" }
+        }
+      }
+    },
+    "/agendamentos": {
+      "post": {
+        "summary": "Cria um novo agendamento de sala",
+        "tags": ["Agendamento"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "salaId": { "type": "integer" },
+                  "data": { "type": "string", "format": "date" },
+                  "horaInicio": { "type": "string" },
+                  "horaFim": { "type": "string" }
+                },
+                "required": ["salaId", "data", "horaInicio", "horaFim"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Agendamento criado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "integer" },
+                    "funcionarioId": { "type": "integer" },
+                    "salaId": { "type": "integer" },
+                    "data": { "type": "string" },
+                    "horaInicio": { "type": "string" },
+                    "horaFim": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Sala ocupada ou dados inválidos" }
+        }
+      },
+      "get": {
+        "summary": "Lista todos os agendamentos do funcionário logado",
+        "tags": ["Agendamento"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista de agendamentos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "integer" },
+                      "funcionarioId": { "type": "integer" },
+                      "salaId": { "type": "integer" },
+                      "data": { "type": "string" },
+                      "horaInicio": { "type": "string" },
+                      "horaFim": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/agendamentos/{id}": {
+      "delete": {
+        "summary": "Cancela um agendamento (apenas pelo próprio funcionário)",
+        "tags": ["Agendamento"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "in": "path", "name": "id", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "204": { "description": "Agendamento cancelado" },
+          "403": { "description": "Só o próprio funcionário pode cancelar seu agendamento ou agendamento não encontrado" },
+          "404": { "description": "Agendamento não encontrado" }
+        }
+      }
+    }
+  }
+}
